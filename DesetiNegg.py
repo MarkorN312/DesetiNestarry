@@ -4,13 +4,23 @@ from PIL import ImageGrab
 from pynput.mouse import Listener
 import logging
 import pyautogui
+import argparse
+import random
+import math
 
 counter = 0
 coordinates = []
 
+def setup():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-r", "--random", required=False, help="random speed")
+    ap.add_argument("-s", "--speed", required=False, help="words per minute")
+    print(ap.parse_args())
+    return vars(ap.parse_args())
+
 def get_text():
     global coordinates
-    im=ImageGrab.grab(bbox=(coordinates))
+    im = ImageGrab.grab(bbox=(coordinates))
     im.save("C:/Users/severyn.marek20/Desktop/test.png",'PNG')
     pytesseract.pytesseract.tesseract_cmd = r'C:\Users\severyn.marek20\Desktop\Tesseract-OCR\tesseract.exe'
     im = Image.open("C:/Users/severyn.marek20/Desktop/test.png")
@@ -18,13 +28,21 @@ def get_text():
     print(text.replace('-', ' ').replace('0', 'o'))
     return text.replace('-', ' ').replace('0', 'o').replace('|', 'l')
 
+def manage_writing():
+    text = get_text()
+    if(setup()['--speed'] != None):
+            time = len(text)/(60*setup()['--speed'])
+    while text != '' or text != None:
+        if(setup()['--random']):
+            time = random.uniform(time - 0.05, time + 0.05)
+        pyautogui.write(text, interval=time)
+
 def on_click(x, y, button, pressed):
     global counter
     if counter > 1:
         listener.stop()
         print(coordinates)
-        text = get_text()
-        pyautogui.write(text[0:len(text) - 10], interval=0.025)
+        manage_writing()
     if pressed:
         coordinates.append(pyautogui.position()[0])
         coordinates.append(pyautogui.position()[1])

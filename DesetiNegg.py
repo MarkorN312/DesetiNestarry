@@ -36,6 +36,7 @@ def manage_writing():
         if(setup()['--random']):
             time = random.uniform(time - 0.05, time + 0.05)
         pyautogui.write(text, interval=time)
+        text = get_text()
 
 def on_click(x, y, button, pressed):
     global counter
